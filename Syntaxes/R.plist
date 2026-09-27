@@ -55,6 +55,30 @@
 					<string>comment.line.pragma-mark.r</string>
 				</dict>
 				<dict>
+					<key>captures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.whitespace.comment.leading.r</string>
+						</dict>
+						<key>2</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.comment.r</string>
+						</dict>
+						<key>4</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.section.r</string>
+						</dict>
+					</dict>
+					<key>match</key>
+					<string>^([ \t]*)(#+)([ \t]*)(.*?[^ \t\-=#\n].*?)([ \t]*([\-=#])\6{3,}[ \t]*)$</string>
+					<key>name</key>
+					<string>comment.line.number-sign.r</string>
+				</dict>
+				<dict>
 					<key>begin</key>
 					<string>(^[ \t]+)?(?=#)</string>
 					<key>beginCaptures</key>

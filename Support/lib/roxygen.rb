@@ -27,28 +27,19 @@ module Roxygen
 			lines
 		end
 
-		def break_or_wrap
-			require ENV["TM_SUPPORT_PATH"] + "/lib/escape.rb"
-
-      line = ENV["TM_CURRENT_LINE"].to_s.chomp
-       # TM_LINE_INDEX is UTF-8 bytes; Ruby 2 indexes by character.
-       n = ENV["TM_LINE_INDEX"].to_i
-       index = if n <= 0
-           0
-       elsif n >= line.bytesize
-           line.length
-       else
-           line.byteslice(0, n).length
-       end
-      wrap_col = (ENV["TM_COLUMNS"] || ENV["TM_WRAP_COLUMN"] || 80).to_i
-
+		# Returns the broken line with a caret marker at the split.
+		# A caret inside the #' prefix is treated as the end of that prefix,
+		# so the prefix is not copied onto the new line.
+		def break_text(line, index, wrap_col)
 			m = prefix_match(line)
 			unless m
-				print e_sn(line[0...index].to_s) + "\n" + e_sn(line[index..-1].to_s) + "$0"
-				return
+				left = line[0...index].to_s
+				right = line[index..-1].to_s
+				return left + "\n" + "\0" + right
 			end
 
 			prefix = m[1] + " "
+			index = m[0].length if index <= m[0].length
 			before = line[0...index]
 			after = line[index..-1].to_s
 			at_end = after.strip.empty?
@@ -56,12 +47,28 @@ module Roxygen
 			budget = [wrap_col - prefix.length, 20].max
 
 			if at_end && content.length > budget
-				lines = wrap_words(prefix, content, budget)
-				print lines.map { |l| e_sn(l) }.join("\n") + "$0"
+				wrap_words(prefix, content, budget).join("\n") + "\0"
 			else
-				leftover = after.lstrip
-				print e_sn(before.rstrip) + "\n" + prefix + e_sn(leftover) + "$0"
+				before.rstrip + "\n" + prefix + "\0" + after.lstrip
 			end
+		end
+
+		def break_or_wrap
+			require ENV["TM_SUPPORT_PATH"] + "/lib/escape.rb"
+
+			line = ENV["TM_CURRENT_LINE"].to_s.chomp
+			# TM_LINE_INDEX is UTF-8 bytes; Ruby 2 indexes by character.
+			n = ENV["TM_LINE_INDEX"].to_i
+			index = if n <= 0
+				0
+			elsif n >= line.bytesize
+				line.length
+			else
+				line.byteslice(0, n).length
+			end
+			wrap_col = (ENV["TM_COLUMNS"] || ENV["TM_WRAP_COLUMN"] || 80).to_i
+			parts = break_text(line, index, wrap_col).split("\0", -1)
+			print parts.map { |part| e_sn(part) }.join("$0")
 		end
 	end
 end

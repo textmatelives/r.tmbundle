@@ -1,5 +1,5 @@
 require 'test/unit'
-require '../lib/roxygen.rb'
+require File.expand_path('../lib/roxygen.rb', File.dirname(__FILE__))
 
 # Port of the /tmp verification battery: drives Roxygen::Line.break_text
 # directly. break_text takes a CHARACTER index and marks the caret with \0.

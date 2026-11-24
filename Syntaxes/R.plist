@@ -519,7 +519,7 @@
 				</dict>
 				<dict>
 					<key>match</key>
-					<string>\\(code|eqn|link|dontrun)\{[^}\n]*\}</string>
+					<string>\\(code|deqn|eqn|link|dontrun)\{[^}\n]*\}</string>
 					<key>name</key>
 					<string>markup.raw.inline.roxygen</string>
 				</dict>
